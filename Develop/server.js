@@ -3,15 +3,11 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
 
-const db = require('../../../db/db.json');
+const db = require('./db/db.json');
 
 const app = express();
 const PORT = 3001;
 const path = require('path');
-
-// TODO: Not sure what the response i used for? I believe this is calling express.response but not sure why it's being used.
-// TODO: What is up with liveserver and backend servers using different PORTS? how does that work?
-const { response } = require('express');
 
 
 app.use(express.static('public')); //for static public folder
@@ -19,16 +15,14 @@ app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 
-// TODO: why does req.ip return only ::1 ?
-
 
 
 
 // GET /notes should return the notes.html file.
 app.get('/notes', (req, res) => {
 
-  console.log(`${req.method} request from ${req.ip}`); 
-  res.sendFile(path.join(__dirname, '../notes.html'))
+  console.log(`${req.method} request from /notes`); 
+  res.sendFile(path.join(__dirname, '/public/notes.html'))
 });
 
 
@@ -37,7 +31,7 @@ app.get('/notes', (req, res) => {
 // GET /api/notes should read the db.json file and return all saved notes as JSON.
 app.get('/api/notes', (req, res) => {
 
-  console.log(`${req.method} request from ${req.ip}`);
+  console.log(`${req.method} request from /api/notes`);
   res.status(200).json(db);
 });
 
@@ -47,7 +41,7 @@ app.get('/api/notes', (req, res) => {
 // POST /api/notes should receive a new note received as 'req.body = JSON.stringify(object)' to save on the request body, add it to the db.json file, and then return the new note to the client. give each note a unique id when it's saved using UUID ).
 app.post('/api/notes', (req, res) => {
 
-  console.log(`${req.method} request from ${req.ip}`);
+  console.log(`${req.method} request from /api/notes`);
 
   let { title, text } = req.body;
 
@@ -69,8 +63,10 @@ app.post('/api/notes', (req, res) => {
               id: uuidv4()
           });
 
+          
+
           // write new data back to the file
-          fs.writeFile('../../../db/db.json', JSON.stringify(databases, null, 4), (err) => {
+          fs.writeFile('./db/db.json', JSON.stringify(databases, null, 4), (err) => {
               if (err) {
                   console.log(`Error writing file: ${err}`);
               }
@@ -80,7 +76,7 @@ app.post('/api/notes', (req, res) => {
 
   }
 
-  res.send('POST request sent.');
+  res.send('Successful POST request');
 
 });
 
@@ -90,15 +86,14 @@ app.post('/api/notes', (req, res) => {
 // TODO: DELETE /api/notes/:id should receive a query parameter that contains the id of a note to delete. To delete a note, you'll need to read all notes from the db.json file, remove the note with the given id property, and then rewrite the notes to the db.json file.
 app.delete('/api/notes:id', function (req, res) {
 
-  console.log(`${req.method} request from ${req.ip}`);
+  console.log(`${req.method} request from /api/notes:id`);
 
   let url = req.originalUrl;
   let urlSplit = url.split(':');
   let id = urlSplit[1];
-  console.log(id);
 
 
-  fs.readFile('../../../db/db.json', 'utf8', (err, data) => {
+  fs.readFile('./db/db.json', 'utf8', (err, data) => {
 
     if (err) {
         console.log(`Error reading file from disk: ${err}`);
@@ -115,7 +110,7 @@ app.delete('/api/notes:id', function (req, res) {
         res.send('DELETE method');
 
         // write new data back to the file
-        fs.writeFile('../../../db/db.json', JSON.stringify(updatedDb, null, 4), (err) => {
+        fs.writeFile('./db/db.json', JSON.stringify(updatedDb, null, 4), (err) => {
             if (err) {
                 console.log(`Error writing file: ${err}`);
             }
@@ -131,8 +126,8 @@ app.delete('/api/notes:id', function (req, res) {
 // GET * should return the index.html file.
 app.get('*', (req, res) =>  {
 
-  console.log(`${req.method} request from ${req.ip}`);
-  res.sendFile(path.join(__dirname, '../index.html'))
+  console.log(`${req.method} request from *`);
+  res.sendFile(path.join(__dirname, '/public/assets/index.html'))
 });
 
 
