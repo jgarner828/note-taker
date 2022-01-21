@@ -8,6 +8,7 @@ const db = require('./db/db.json');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const path = require('path');
+const { parse } = require('path/posix');
 
 
 app.use(express.static('public')); //for static public folder
@@ -27,7 +28,6 @@ app.get('/notes', (req, res) => {
 
 
 
-
 // GET /api/notes should read the db.json file and return all saved notes as JSON.
 app.get('/api/notes', (req, res) => {
 
@@ -37,18 +37,18 @@ app.get('/api/notes', (req, res) => {
 
 
 
-
 // POST /api/notes should receive a new note received as 'req.body = JSON.stringify(object)' to save on the request body, add it to the db.json file, and then return the new note to the client. give each note a unique id when it's saved using UUID ).
 app.post('/api/notes', (req, res) => {
 
   console.log(`${req.method} request from /api/notes`);
+
 
   let { title, text } = req.body;
 
   if (title && text) {
 
         // read the file
-    fs.readFile('../../../db/db.json', 'utf8', (err, data) => {
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
 
       if (err) {
           console.log(`Error reading file from disk: ${err}`);
@@ -82,16 +82,14 @@ app.post('/api/notes', (req, res) => {
 
 
 
-
-// TODO: DELETE /api/notes/:id should receive a query parameter that contains the id of a note to delete. To delete a note, you'll need to read all notes from the db.json file, remove the note with the given id property, and then rewrite the notes to the db.json file.
-app.delete('/api/notes:id', function (req, res) {
-
-  console.log(`${req.method} request from /api/notes:id`);
+// DELETE /api/notes/:id should receive a query parameter that contains the id of a note to delete. To delete a note, you'll need to read all notes from the db.json file, remove the note with the given id property, and then rewrite the notes to the db.json file.
+app.delete('/api/notes/*', function (req, res) {
 
   let url = req.originalUrl;
-  let urlSplit = url.split(':');
+  let urlSplit = url.split('notes/');
   let id = urlSplit[1];
 
+  console.log(`${req.method} request from /api/notes/ for ${urlSplit[1]}`);
 
   fs.readFile('./db/db.json', 'utf8', (err, data) => {
 
@@ -115,11 +113,12 @@ app.delete('/api/notes:id', function (req, res) {
                 console.log(`Error writing file: ${err}`);
             }
         });
+
     }
   });
-
+  res.status(200).end();
+  
 });
-
 
 
 
@@ -127,7 +126,7 @@ app.delete('/api/notes:id', function (req, res) {
 app.get('*', (req, res) =>  {
 
   console.log(`${req.method} request from *`);
-  res.sendFile(path.join(__dirname, '/public/assets/index.html'))
+  res.sendFile(path.join(__dirname, '/public/index.html'))
 });
 
 
