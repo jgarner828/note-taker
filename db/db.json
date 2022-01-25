@@ -1,22 +1,12 @@
 [
     {
-        "title": "TESTING POST RETURN TITLE",
-        "text": "TESTING POST RETURN TEXT",
+        "title": "Study group",
+        "text": "5pm - 7pm Thursday",
         "id": "3ae4da04-b09d-474d-9d68-1b5b6d944534"
     },
     {
-        "title": "TESTING POST RETURN TITLE",
-        "text": "TESTING POST RETURN TEXT",
+        "title": "Groceries",
+        "text": "Dont forget to get milk",
         "id": "09f4b77e-96b9-4c92-a851-63d48a3ad850"
-    },
-    {
-        "title": "TESTING POST RETURN TITLE",
-        "text": "TESTING POST RETURN TEXT",
-        "id": "6c6607d8-8878-4262-a3cd-5d32782cc485"
-    },
-    {
-        "title": "TESTING POST RETURN TITLE AGAIN",
-        "text": "TESTING POST RETURN TEXT AGAIN",
-        "id": "c56947b1-e987-4fe6-b9aa-cb920e7f2224"
     }
 ]
