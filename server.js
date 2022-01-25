@@ -69,12 +69,19 @@ app.post('/api/notes', (req, res) => {
                   console.log(`Error writing file: ${err}`);
               }
           });
+
+          let newNote = databases.splice(-1);
+          console.log(newNote[0]);
+
+          res.send(newNote[0]);
+
       }
     });
 
+    
+
   }
 
-  res.send('Successful POST request');
 
 });
 
@@ -102,8 +109,6 @@ app.delete('/api/notes/*', function (req, res) {
           return note.id !== id;
         });
 
-        // match and delete id
-        res.send('DELETE method');
 
         // write new data back to the file
         fs.writeFile('./db/db.json', JSON.stringify(updatedDb, null, 4), (err) => {
