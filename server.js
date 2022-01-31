@@ -3,7 +3,7 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
-const db = require('./db/db.json');
+// const db = require('./db/db.json');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -30,7 +30,9 @@ app.get('/notes', (req, res) => {
 app.get('/api/notes', (req, res) => {
 
   console.log(`${req.method} request from /api/notes`);
-  res.status(200).json(db);
+  let db = fs.readFileSync(path.join(__dirname, "./db/db.json"));
+  db = JSON.parse(db);
+  res.json(db);
 });
 
 
@@ -61,7 +63,7 @@ app.post('/api/notes', (req, res) => {
               id: uuidv4()
           });
 
-          
+          res.json(databases);
 
           // write new data back to the file
           fs.writeFile('./db/db.json', JSON.stringify(databases, null, 4), (err) => {
@@ -69,12 +71,6 @@ app.post('/api/notes', (req, res) => {
                   console.log(`Error writing file: ${err}`);
               }
           });
-
-          let newNote = databases.splice(-1);
-          console.log(newNote[0]);
-
-          res.send(newNote[0]);
-
       }
     });
 
@@ -88,13 +84,11 @@ app.post('/api/notes', (req, res) => {
 
 
 // DELETE /api/notes/:id should receive a query parameter that contains the id of a note to delete. To delete a note, you'll need to read all notes from the db.json file, remove the note with the given id property, and then rewrite the notes to the db.json file.
-app.delete('/api/notes/*', function (req, res) {
+app.delete('/api/notes/:id', function (req, res) {
 
-  let url = req.originalUrl;
-  let urlSplit = url.split('notes/');
-  let id = urlSplit[1];
+  let id = req.params.id;
 
-  console.log(`${req.method} request from /api/notes/ for ${urlSplit[1]}`);
+  console.log(`${req.method} request from /api/notes/ for ${id}`);
 
   fs.readFile('./db/db.json', 'utf8', (err, data) => {
 
@@ -109,6 +103,7 @@ app.delete('/api/notes/*', function (req, res) {
           return note.id !== id;
         });
 
+        res.json(updatedDb);
 
         // write new data back to the file
         fs.writeFile('./db/db.json', JSON.stringify(updatedDb, null, 4), (err) => {
@@ -119,14 +114,13 @@ app.delete('/api/notes/*', function (req, res) {
 
     }
   });
-  res.status(200).end();
   
 });
 
 
 
-// GET * should return the index.html file.
-app.get('*', (req, res) =>  {
+// GET / should return the index.html file.
+app.get('/', (req, res) =>  {
 
   console.log(`${req.method} request from *`);
   res.sendFile(path.join(__dirname, '/public/index.html'))
